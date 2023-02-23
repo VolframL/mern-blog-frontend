@@ -19,12 +19,34 @@ export const AddPost = () => {
   // const [isLoading, setLoading] = React.useState(false);
   const [text, setText] = React.useState('');
   const [title, setTitle] = React.useState('');
-  const [tags, setTags] = React.useState('');
+  const [inputTag, setInputTag] = React.useState('');
+  const [tags, setTags] = React.useState([]);
   const [imageUrl, setImageUrl] = React.useState('');
 
   const isEditing = Boolean(id);
 
   const inputFileRef = React.useRef(null);
+
+  const splitTags = (e) => {
+    const tag = e.target.value;
+    if (tag.length > 15 || tags.length >= 5) {
+      return;
+    }
+    const comma = tag.charAt(tag.length - 1) === ',';
+
+    setInputTag(tag);
+    if (comma && !inputTag.includes(',') && inputTag.trim() !== '') {
+      const newArr = [...tags, tag.slice(0, -1).trim()];
+      setTags(newArr);
+      setInputTag('');
+    }
+  }
+
+  const deleteTag = (i) => {
+    let newArr = [...tags];
+    newArr.splice(i,1);
+    setTags(newArr);
+  }
 
   const handleChangeFile = async (e) => {
     try {
@@ -130,13 +152,25 @@ export const AddPost = () => {
         onChange={e => setTitle(e.target.value)}
         fullWidth
       />
-      <TextField 
-        classes={{ root: styles.tags }} 
-        variant="standard" 
-        placeholder="Тэги" 
-        value={tags}
-        onChange={e => setTags(e.target.value)}
-        fullWidth />
+      <div className="tags" style={{display: 'flex'}}>
+        {tags[0] !== '' ?
+          tags.map((name, i) => (
+            <Button key={i} onClick={() => deleteTag(i)}>
+              {name}
+            </Button>
+          )):
+          <Button key="no tag"> 
+          </Button>}            
+        <TextField 
+          style={{marginLeft: '10px' }}
+          classes={{ root: styles.tags }} 
+          variant="standard" 
+          placeholder="Тэги"
+          value={inputTag}
+          onChange={e => splitTags(e)}
+          fullWidth
+          />
+      </div>
       <SimpleMDE className={styles.editor} value={text} onChange={onChange} options={options} />
       <div className={styles.buttons}>
         <Button onClick={onSubmit} size="large" variant="contained">

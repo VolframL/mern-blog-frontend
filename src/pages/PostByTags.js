@@ -24,6 +24,9 @@ export const PostByTags = () => {
   return (
     <Grid container spacing={4}>
       <Grid xs={12} item>
+        <div style={{ fontSize: 40, color: 'gray' }}>#{tag}</div>
+      </Grid>
+      <Grid xs={12} item>
         {(isPostsLoading ? [...Array(5)] : posts.items).map((obj, index) =>
           isPostsLoading ? (
             <Post key={index} isLoading={true} />
