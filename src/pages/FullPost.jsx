@@ -18,11 +18,12 @@ export const FullPost = () => {
       .then(res => {
         setData(res.data)
         setIsLoading(false);
+
       })
       .catch(err => {
         console.warn(err);
         alert('Ошибка получения статьи');
-      })
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
@@ -47,22 +48,7 @@ export const FullPost = () => {
         <ReactMarkdown children={data.text}></ReactMarkdown>
       </Post>
       <CommentsBlock
-        items={[
-          {
-            user: {
-              fullName: "Вася Пупкин",
-              avatarUrl: "https://mui.com/static/images/avatar/1.jpg",
-            },
-            text: "Это тестовый комментарий 555555",
-          },
-          {
-            user: {
-              fullName: "Иван Иванов",
-              avatarUrl: "https://mui.com/static/images/avatar/2.jpg",
-            },
-            text: "When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top",
-          },
-        ]}
+        items={data.comments}
         isLoading={false}
       >
         <Index />

@@ -1,47 +1,97 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import {useForm} from 'react-hook-form';
+// import {useForm} from 'react-hook-form';
 import { fetchRegister, selectIsAuth } from "../../redux/slices/auth";
 import Avatar from '@mui/material/Avatar';
+
+import axios from '../../axios';
 
 import styles from './Login.module.scss';
 
 export const Registration = () => {
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
+  const [fullName, setFullName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
   const isAuth = useSelector(selectIsAuth);
 
+  const inputFileRef = useRef(null);
   const dispatch = useDispatch();
+  // const {register, handleSubmit, formState: {errors, isValid}} = useForm({
+  //   defaultValues: {
+  //     fullName: '',
+  //     email: '',
+  //     password: '',
+  //     avatarUrl
+  //   },
+  //   mode: 'onChange'
+  // })
 
-  const {register, handleSubmit, formState: {errors, isValid}} = useForm({
-    defaultValues: {
-      fullName: '',
-      email: '',
-      password: ''
-    },
-    mode: 'onChange'
-  })
-
-  const onSubmit = async (values) => {
-    const data = await dispatch(fetchRegister(values));
-
-    if(!data.payload) {
-      return alert('Не удалось зарегистрироваться');
+  const handleChangeFile = async (e) => {
+    try {
+      const formData = new FormData();
+      const file = e.target.files[0];
+      formData.append('image', file);
+      const {data} = await axios.post('/uploadAvatar', formData);
+      setAvatarUrl(data.url);
+    } catch (error) {
+      console.warn(error);
+      alert('Ошибка при загрузке файла')
     }
+    
+  };
 
-    if ('token' in data.payload) {
-      window.localStorage.setItem('token', data.payload.token);
-    }
-  }
+  // const onSubmit = async (values) => {
+  //   const data = await dispatch(fetchRegister(values));
+
+  //   if(!data.payload) {
+  //     return alert('Не удалось зарегистрироваться');
+  //   }
+
+  //   if ('token' in data.payload) {
+  //     window.localStorage.setItem('token', data.payload.token);
+  //   }
+  // }
 
   if(isAuth) {
     return <Navigate to="/"/>
   }
 
+  const onSubmit = async () => {
+    try {
+      // setLoading(true);
+      const fields = {
+        fullName, 
+        email,
+        password,
+        avatarUrl: avatarUrl ?? '/uploads/noavatar.png'
+      }
 
+      const data = await dispatch(fetchRegister(fields));
+
+      if(!data.payload) {
+        return alert('Не удалось зарегистрироваться');
+      }
+
+      if ('token' in data.payload) {
+        window.localStorage.setItem('token', data.payload.token);
+      }
+      if ('avatarUrl' in data.payload) {
+        window.localStorage.setItem('avatarUrl', data.payload.avatarUrl);
+      }
+
+    } catch (error) {
+      console.warn(error);
+      alert('Ошибка при регистрации')
+
+    }
+  }
 
   return (
     <Paper classes={{ root: styles.root }}>
@@ -49,9 +99,55 @@ export const Registration = () => {
         Создание аккаунта
       </Typography>
       <div className={styles.avatar}>
-        <Avatar sx={{ width: 100, height: 100 }} />
+        {avatarUrl? (
+          <Avatar 
+          onClick={() => inputFileRef.current.click()} 
+          sx={{ width: 100, height: 100 }}
+          alt="avatar"
+          src={`http://localhost:4444${avatarUrl}`}  />
+        ):(
+          <Avatar 
+          onClick={() => inputFileRef.current.click()} 
+          sx={{ width: 100, height: 100 }}/>
+        )}
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+        <input 
+          ref={inputFileRef} 
+          type="file" 
+          onChange={handleChangeFile} 
+          hidden/>
+        <TextField 
+          className={styles.field} 
+          label="Полное имя" 
+          value={fullName}
+          onChange={e => setFullName(e.target.value)}
+          fullWidth/>
+        <TextField 
+          className={styles.field} 
+          label="E-Mail" 
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          fullWidth/>
+        <TextField 
+          className={styles.field} 
+          label="Пароль" 
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          fullWidth/>
+        <Button onClick={onSubmit} size="large" variant="contained" fullWidth>
+          Зарегистрироваться
+        </Button>
+      {/* <form onSubmit={handleSubmit(onSubmit)}>
+
+        <input 
+          // ref={inputFileRef} 
+          type="file" 
+          onChange={handleChangeFile} 
+          hidden 
+          error={Boolean(errors.avatarUrl?.message)}
+          helperText={errors.avatarUrl?.message}
+          {...register('inputFileRef')}
+          />
         <TextField 
           className={styles.field} 
           label="Полное имя" 
@@ -75,8 +171,8 @@ export const Registration = () => {
           {...register('password', {required: 'Укажите пароль'})}/>
         <Button disabled={!isValid} type="submit" size="large" variant="contained" fullWidth>
           Зарегистрироваться
-        </Button>
-      </form>
+        </Button> 
+        </form>*/}
     </Paper>
   );
 };
