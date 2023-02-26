@@ -21,6 +21,16 @@ export const fetchTags = createAsyncThunk('posts/fetchTags', async () => {
   return data;
 });
 
+export const fetchPostById = createAsyncThunk('posts/fetchPostById', async (id) => {
+  const { data } = await axios.get(`/posts/${id}`);
+  return data;
+});
+
+export const addComment = createAsyncThunk('posts/addComment', async (fields) => {
+  const { data } = await axios.patch(`/posts/${fields.id}/comments`, fields);
+  return data;
+});
+
 const initialState = {
   posts: {
     items: [],
@@ -30,12 +40,20 @@ const initialState = {
     items: [],
     status: 'loading',
   },
+  post: {
+    post: {},
+    status: 'loading',
+  },
 };
 
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
+    // addComment: (state, action) => {
+    //   console.log(state);
+    //   console.log(action);
+    // },
     postsFilter: (state, action) => {
       if (action.payload === 'NEW') {
         state.posts.items = state.posts.items.sort((a, b) => {
@@ -88,6 +106,33 @@ const postsSlice = createSlice({
     [fetchPostsByTag.rejected]: (state) => {
       state.posts.items = [];
       state.posts.status = 'error';
+    },
+    // Получение статьи по тегу
+    [fetchPostById.pending]: (state) => {
+      state.post.post = {};
+      state.post.status = 'loading';
+    },
+    [fetchPostById.fulfilled]: (state, action) => {
+      state.post.post = action.payload;
+      state.post.status = 'loaded';
+    },
+    [fetchPostById.rejected]: (state) => {
+      state.post.post = {};
+      state.post.status = 'error';
+    },
+    // Добавление комментариев
+    [addComment.pending]: (state) => {
+      state.post.post.status = 'loading';
+    },
+    [addComment.fulfilled]: (state, action) => {
+      const arr = state.post.post.comments;
+      arr.push(action.meta.arg);
+      state.post.post.comments = arr;
+      state.post.post.status = 'loaded';
+    },
+    [addComment.rejected]: (state) => {
+      state.post.post.comments = [];
+      state.post.post.status = 'error';
     },
     // Получение тегов
     [fetchTags.pending]: (state) => {

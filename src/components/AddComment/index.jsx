@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { useParams } from "react-router-dom";
 
@@ -12,23 +12,48 @@ import Button from "@mui/material/Button";
 import { selectIsAuth } from "../../redux/slices/auth";
 import axios from '../../axios';
 
+import { addComment } from "../../redux/slices/posts";
+
 export const Index = () => {
+  const dispatch = useDispatch();
   const {id} = useParams();
+
   const isAuth = useSelector(selectIsAuth);
+  const userData = useSelector(state => state.auth.data);
   const [text, setText] = React.useState('');
   const avatarUrl = window.localStorage.getItem('avatarUrl');
 
-  const onSubmit = async () => {
-    try {
-      const fields = {
-        text,
-      }
 
-      await axios.post(`/posts/${id}/comments`, fields);
+
+  const onSubmit = async () => {
+    // try {
+    //   const fields = {
+    //     text,
+    //   }
+
+    //   await axios.patch(`/posts/${id}/comments`, fields);
+    //   setText('');
+    // } catch (error) {
+    //   console.warn(error);
+    //   alert('Ошибка при создании комментария')
+    // }
+    try {
+      
+      const fields = {
+        id,
+        text,
+        // author: {
+        //   id: userData._id, 
+        //   avatarUrl: userData.avatarUrl,
+        //   fullName: userData.fullName
+        // },
+        author: userData._id,
+        timestamps: Date.now()
+      }
+      dispatch(addComment(fields));
       setText('');
     } catch (error) {
-      console.warn(error);
-      alert('Ошибка при создании комментария')
+      console.log(error);
     }
   }
 

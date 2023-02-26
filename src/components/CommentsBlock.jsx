@@ -1,6 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, {useState, useEffect} from "react";
 import { SideBlock } from "./SideBlock";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -10,40 +8,28 @@ import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import Skeleton from "@mui/material/Skeleton";
 
-import axios from "../axios";
 
 
-export const CommentsBlock = ({ children }) => {
-  const [data, setData] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-  const {id} = useParams();
+export const CommentsBlock = ({ items, children, isLoading }) => {
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(id? `/posts/${id}/comments` : '/comments')
-      .then(res => {
-        setData(res.data)
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.warn(err);
-        alert('Ошибка получения комментариев');
-      });
+    setComments(items);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
+  }, [])
 
 
   return (
     <SideBlock title="Комментарии">
       <List>
-        {(isLoading ? [...Array(5)] : data).map((obj, index) => (
+        {(isLoading ? [...Array(5)] : comments).map((obj, index) => (
           <React.Fragment key={index}>
-            <ListItem alignItems="flex-start">
+            {/* <ListItem alignItems="flex-start">
               <ListItemAvatar>
                 {isLoading ? (
                   <Skeleton variant="circular" width={40} height={40} />
                 ) : (
-                  <Avatar alt={obj.user.fullName} src={`http://localhost:4444${obj.user.avatarUrl}`} />
+                  <Avatar alt={obj.author.fullName} src={`http://localhost:4444${obj.author.avatarUrl}`} />
                 )}
               </ListItemAvatar>
               {isLoading ? (
@@ -53,11 +39,11 @@ export const CommentsBlock = ({ children }) => {
                 </div>
               ) : (
                 <ListItemText
-                  primary={obj.user.fullName}
+                  primary={obj.author.fullName}
                   secondary={obj.text}
                 />
               )}
-            </ListItem>
+            </ListItem> */}
             <Divider variant="inset" component="li" />
           </React.Fragment>
         ))}

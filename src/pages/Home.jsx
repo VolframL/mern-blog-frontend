@@ -30,6 +30,7 @@ export const Home = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
 
+
   return (
     <>
       <Tabs style={{ marginBottom: 15 }} value={tab === 'NEW'? 0 : 1} aria-label="basic tabs example">
@@ -50,7 +51,7 @@ export const Home = () => {
                 user={obj.user}
                 createdAt={obj.createdAt}
                 viewsCount={obj.viewsCount}
-                commentsCount={3}
+                commentsCount={obj.comments.length}
                 tags={obj.tags}
                 isEditable={userData?._id === obj.user._id}
               />
@@ -62,14 +63,14 @@ export const Home = () => {
           <CommentsBlock
             items={[
               {
-                user: {
+                author: {
                   fullName: 'Вася Пупкин',
                   avatarUrl: 'https://mui.com/static/images/avatar/1.jpg',
                 },
                 text: 'Это тестовый комментарий',
               },
               {
-                user: {
+                author: {
                   fullName: 'Иван Иванов',
                   avatarUrl: 'https://mui.com/static/images/avatar/2.jpg',
                 },
