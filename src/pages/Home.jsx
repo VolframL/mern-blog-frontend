@@ -11,10 +11,11 @@ import { fetchPosts, fetchTags, postsFilter } from '../redux/slices/posts';
 export const Home = () => {
   const dispatch = useDispatch();
   const [tab, setTab] = useState('NEW');
-  // const [filteredPosts, setFilteredPosts] = useState([...Array(5)]);
 
   const userData = useSelector(state => state.auth.data);
   const {posts, tags} = useSelector(state => state.posts);
+
+
 
   const isPostsLoading = posts.status === 'loading';
   const isTagsLoading = tags.status === 'loading';
@@ -29,6 +30,27 @@ export const Home = () => {
     dispatch(postsFilter(tab));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
+
+  useEffect(() => {
+    dispatch(fetchTags());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posts])
+
+  const getLastComents = () => {
+    if (posts.status === 'loaded') {
+      const lastComments = [];
+      posts.items.forEach((item) => {
+        lastComments.push(item.comments);
+      });
+      return lastComments.flat().sort((a, b) => {
+        if (a.timestamps > b.timestamps) {
+          return 1
+        } else if (a.timestamps < b.timestamps) {
+          return -1
+        } else return 0;
+      }).slice(-lastComments.flat.length - 5).reverse();
+    }
+  }
 
 
   return (
@@ -61,23 +83,8 @@ export const Home = () => {
         <Grid xs={4} item>
           <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock
-            items={[
-              {
-                author: {
-                  fullName: 'Вася Пупкин',
-                  avatarUrl: 'https://mui.com/static/images/avatar/1.jpg',
-                },
-                text: 'Это тестовый комментарий',
-              },
-              {
-                author: {
-                  fullName: 'Иван Иванов',
-                  avatarUrl: 'https://mui.com/static/images/avatar/2.jpg',
-                },
-                text: 'When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top',
-              },
-            ]}
-            isLoading={false}
+            items={getLastComents()}
+            isLoading={isPostsLoading}
           />
         </Grid>
       </Grid>

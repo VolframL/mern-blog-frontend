@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
@@ -21,28 +21,6 @@ export const FullPost = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const [data, setData] = useState();
-  // const [isLoading, setIsLoading] = useState(true);
-
-
-  // useEffect(() => {
-  //   axios
-  //     .get(`/posts/${id}`)
-  //     .then(res => {
-  //       setData(res.data)
-  //       setIsLoading(false);
-
-  //     })
-  //     .catch(err => {
-  //       console.warn(err);
-  //       alert('Ошибка получения статьи');
-  //     });
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[]);
-
-  // if (isLoading) {
-  //   return <Post isLoading={isLoading}/>
-  // }  
   if (isPostLoading) {
     return <Post isLoading={isPostLoading}/>
   }
@@ -57,8 +35,8 @@ export const FullPost = () => {
         user={post.post.user}
         createdAt={post.post.createdAt}
         viewsCount={post.post.viewsCount}
-        commentsCount={10}
-        // commentsCount={post.post.comments.length}
+        // commentsCount={10}
+        commentsCount={post.post.comments.length}
         tags={post.post.tags}
         isFullPost
       >

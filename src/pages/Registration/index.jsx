@@ -23,15 +23,6 @@ export const Registration = () => {
 
   const inputFileRef = useRef(null);
   const dispatch = useDispatch();
-  // const {register, handleSubmit, formState: {errors, isValid}} = useForm({
-  //   defaultValues: {
-  //     fullName: '',
-  //     email: '',
-  //     password: '',
-  //     avatarUrl
-  //   },
-  //   mode: 'onChange'
-  // })
 
   const handleChangeFile = async (e) => {
     try {
@@ -46,18 +37,6 @@ export const Registration = () => {
     }
     
   };
-
-  // const onSubmit = async (values) => {
-  //   const data = await dispatch(fetchRegister(values));
-
-  //   if(!data.payload) {
-  //     return alert('Не удалось зарегистрироваться');
-  //   }
-
-  //   if ('token' in data.payload) {
-  //     window.localStorage.setItem('token', data.payload.token);
-  //   }
-  // }
 
   if(isAuth) {
     return <Navigate to="/"/>
@@ -129,6 +108,7 @@ export const Registration = () => {
           onChange={e => setEmail(e.target.value)}
           fullWidth/>
         <TextField 
+          type='password'
           className={styles.field} 
           label="Пароль" 
           value={password}

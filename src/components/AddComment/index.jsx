@@ -10,7 +10,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 
 import { selectIsAuth } from "../../redux/slices/auth";
-import axios from '../../axios';
 
 import { addComment } from "../../redux/slices/posts";
 
@@ -21,32 +20,13 @@ export const Index = () => {
   const isAuth = useSelector(selectIsAuth);
   const userData = useSelector(state => state.auth.data);
   const [text, setText] = React.useState('');
-  const avatarUrl = window.localStorage.getItem('avatarUrl');
-
-
 
   const onSubmit = async () => {
-    // try {
-    //   const fields = {
-    //     text,
-    //   }
-
-    //   await axios.patch(`/posts/${id}/comments`, fields);
-    //   setText('');
-    // } catch (error) {
-    //   console.warn(error);
-    //   alert('Ошибка при создании комментария')
-    // }
     try {
       
       const fields = {
         id,
         text,
-        // author: {
-        //   id: userData._id, 
-        //   avatarUrl: userData.avatarUrl,
-        //   fullName: userData.fullName
-        // },
         author: userData._id,
         timestamps: Date.now()
       }
@@ -57,15 +37,13 @@ export const Index = () => {
     }
   }
 
-
-
   return (
     (isAuth?
     <>
       <div className={styles.root}>
         <Avatar
           classes={{ root: styles.avatar }}
-          src={`http://localhost:4444${avatarUrl}`}
+          src={`http://localhost:4444${userData.avatarUrl}`}
         />
         <div className={styles.form}>
           <TextField

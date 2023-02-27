@@ -33,6 +33,7 @@ export const Post = ({
     return <PostSkeleton />;
   }
 
+
   const onClickRemove = () => {
     if (window.confirm('Вы действительно хотите удалить статью?')){
       dispatch(fetchRemovePost(id));

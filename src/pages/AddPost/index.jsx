@@ -1,4 +1,4 @@
-import React from 'react';
+import {useRef, useEffect, useState, useCallback, useMemo} from 'react';
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -17,15 +17,15 @@ export const AddPost = () => {
   const isAuth = useSelector(selectIsAuth);
 
   // const [isLoading, setLoading] = React.useState(false);
-  const [text, setText] = React.useState('');
-  const [title, setTitle] = React.useState('');
-  const [inputTag, setInputTag] = React.useState('');
-  const [tags, setTags] = React.useState([]);
-  const [imageUrl, setImageUrl] = React.useState('');
+  const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const [inputTag, setInputTag] = useState('');
+  const [tags, setTags] = useState([]);
+  const [imageUrl, setImageUrl] = useState('');
 
   const isEditing = Boolean(id);
 
-  const inputFileRef = React.useRef(null);
+  const inputFileRef = useRef(null);
 
   const splitTags = (e) => {
     const tag = e.target.value;
@@ -37,6 +37,15 @@ export const AddPost = () => {
     setInputTag(tag);
     if (comma && !inputTag.includes(',') && inputTag.trim() !== '') {
       const newArr = [...tags, tag.slice(0, -1).trim()];
+      setTags(newArr);
+      setInputTag('');
+    }
+  }
+
+  const makeArrayOnBlur = (e) => {
+    const tag = e.target.value;
+    if (tag) {
+      const newArr = [...tags, tag];
       setTags(newArr);
       setInputTag('');
     }
@@ -66,7 +75,7 @@ export const AddPost = () => {
     setImageUrl('');
   };
 
-  const onChange = React.useCallback((value) => {
+  const onChange = useCallback((value) => {
     setText(value);
   }, []);
 
@@ -92,7 +101,7 @@ export const AddPost = () => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       axios
         .get(`/posts/${id}`)
@@ -109,7 +118,7 @@ export const AddPost = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const options = React.useMemo(
+  const options = useMemo(
     () => ({
       spellChecker: false,
       maxHeight: '400px',
@@ -166,6 +175,7 @@ export const AddPost = () => {
           classes={{ root: styles.tags }} 
           variant="standard" 
           placeholder="Тэги"
+          onBlur={(e) => makeArrayOnBlur(e)}
           value={inputTag}
           onChange={e => splitTags(e)}
           fullWidth
